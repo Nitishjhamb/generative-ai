@@ -1,0 +1,23 @@
+# Ignore node_modules
+node_modules
+
+# Ignore log files
+*.log
+
+# Ignore local environment files
+.env
+
+# Ignore Dockerfile and .dockerignore].
+Dockerfile
+.dockerignore
+
+# Ignore test directories and files
+/tests
+/test.js
+
+# Ignore build artifacts
+dist
+build
+
+# Ignore any other local configuration files
+*.local
