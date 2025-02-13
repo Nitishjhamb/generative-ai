@@ -3,13 +3,14 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import axios from 'axios';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-
+import dotenv from 'dotenv';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 const app = express();
 const port = 3000;
-const API_KEY = "AIzaSyCeOkzFJ-JLys3cQIyN1NnrAznriR4aho0";
+dotenv.config();
+const API_KEY = process.env.API_KEY;
 const MODEL_NAME = "gemini-1.0-pro";
 
 app.use(express.json()); // Ensure that you can parse JSON requests
