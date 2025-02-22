@@ -6,21 +6,26 @@
     <title>AI Chat</title>
     <style>
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: #0f172a;
-            margin: 0;
-            padding: 0;
-            color: #e2e8f0;
+            font-family: Arial, sans-serif;
+            background-color: #121212;
             display: flex;
             justify-content: center;
             align-items: center;
+            margin: 0;
+            padding: 0;
             height: 100vh;
+            background-image: url('dots-background-dark.png'); /* Update to a dark background with dots */
+            background-size: cover;
+            color: #ffffff; /* Default text color */
         }
 
         #chat-container {
-            width: 100vw;
-            height: 100vh;
-            background: #1e293b;
+            background-color: #1e1e1e; /* Darker background for chat container */
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.5);
+            width: 350px;
+            height: 550px;
             display: flex;
             flex-direction: column;
             position: relative;
@@ -30,77 +35,130 @@
         .chat-header {
             display: flex;
             align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #6366f1, #8b5cf6);
-            padding: 15px;
+            background-color: #673ab7; /* Purple header remains the same */
+            padding: 10px;
             color: white;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+        }
+
+        .chat-header img {
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
+        }
+
+        .app-title {
+            flex-grow: 1;
             font-size: 18px;
             font-weight: bold;
         }
 
+
         #chat {
             flex: 1;
             overflow-y: auto;
+            margin-bottom: 20px;
             padding: 10px;
-            background: #334155;
+            background-color: #2a2a2a; /* Darker background for chat area */
         }
 
         .typing-indicator {
+            display: none; /* Initially hidden */
             font-size: 14px;
-            color: #94a3b8;
-            display: none;
+            color: #999;
+        }
+
+        #user-input {
+            flex-grow: 1;
+            padding: 10px;
+            background-color: #333; /* Darker input background */
+            color: #ffffff; /* Input text color */
+            border: 1px solid #555;
+            border-radius: 20px;
+            margin-right: 10px;
         }
 
         .input-container {
             display: flex;
             align-items: center;
             padding: 10px;
-            background: #1e293b;
-        }
-
-        #user-input {
-            flex-grow: 1;
-            padding: 10px;
-            background: #475569;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            outline: none;
+            background-color: #1e1e1e;
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
         }
 
         .send-button {
-            background: #6366f1;
+            background-color: #673ab7; /* Keep the purple button */
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 8px;
-            margin-left: 10px;
+            padding: 10px;
             cursor: pointer;
-            transition: background 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
         }
 
-        .send-button:hover {
-            background: #4f46e5;
+        .send-button img {
+            width: 50px;
+            height: 20px;
+            align-items: center;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 14px;
+            color: #aaa;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
     <div id="chat-container">
-        <div class="chat-header">AI Chat</div>
-        <div id="chat"></div>
-        <div class="input-container">
-            <input type="text" id="user-input" placeholder="Type a message...">
-            <button class="send-button" id="send-button">Send</button>
+        <header class="chat-header">
+            <h1 class="app-title">AI BOT</h1>
+        </header>
+
+        <div id="chat">
+            <!-- Typing indicator -->
+            <p class="typing-indicator">AI is typing...</p>
         </div>
+
+        <div class="input-container">
+            <input type="text" id="user-input" placeholder="Type a message..." autocomplete="off">
+            <button class="send-button" id="send-button">
+                <p>Send</p>
+            </button>
+        </div>
+
+        <footer class="footer">License 2024 by Nitish Jhamb</footer>
     </div>
 
     <script>
         document.getElementById('send-button').addEventListener('click', sendMessage);
         document.getElementById('user-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') sendMessage();
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
         });
 
-        function sendMessage() {
+        function typeWriterEffect(text, element) {
+            let i = 0;
+            const speed = 20;  // speed of typewriter effect
+            function type() {
+                if (i < text.length) {
+                    element.innerHTML += text.charAt(i);
+                    i++;
+                    setTimeout(type, speed);
+                }
+            }
+            type();
+        }
+
+        async function sendMessage() {
             const input = document.getElementById('user-input').value;
             if (!input) return;
 
@@ -108,6 +166,27 @@
             const userMessage = document.createElement('p');
             userMessage.innerHTML = `<strong>You:</strong> ${input}`;
             chatDiv.appendChild(userMessage);
+
+            const typingIndicator = document.querySelector('.typing-indicator');
+            typingIndicator.style.display = 'block'; // Show typing indicator
+
+            const response = await fetch('http://localhost:3000/api/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: input }),
+            });
+
+            const data = await response.json();
+            typingIndicator.style.display = 'none'; // Hide typing indicator
+
+            const aiResponse = document.createElement('p');
+            aiResponse.innerHTML = `<strong>AI:</strong> `;
+            chatDiv.appendChild(aiResponse);
+
+            typeWriterEffect(data.message || data.error, aiResponse);
+
             document.getElementById('user-input').value = '';
             chatDiv.scrollTop = chatDiv.scrollHeight;
         }
